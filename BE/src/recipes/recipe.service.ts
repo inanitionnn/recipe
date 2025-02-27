@@ -78,7 +78,6 @@ export class RecipeService {
     try {
       const baseUrl = this.configService.get<string>('recipeApiUrl');
       const link = `${baseUrl}lookup.php?i=${id}`;
-      console.log(link);
       const response = await firstValueFrom(
         this.httpService.get<{ meals: [object] }>(link),
       );

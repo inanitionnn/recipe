@@ -20,16 +20,9 @@ This is the backend for the Recipe Book application, built with [Nest.js](https:
 
 2. Start application
 
-```bash
-npm run dev
-```
-
-Or
-
-```bash
-npm run build
-npm run prod
-```
+   ```bash
+   npm run dev
+   ```
 
 ### Available Scripts
 
