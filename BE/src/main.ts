@@ -1,8 +1,39 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { HttpExceptionFilter } from './shared/filters';
+import { ValidationPipe } from '@nestjs/common';
+import { SwaggerModule } from '@nestjs/swagger';
+import { EnvironmentEnum } from './shared/enums';
+import { swaggerConfig } from './shared/config';
+import { AppConfigType } from './shared/types';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  await app.listen(process.env.PORT ?? 3000);
+
+  app.enableCors();
+
+  const configService = app.get<ConfigService<AppConfigType>>(ConfigService);
+
+  // Swagger
+  if (configService.get('environment') === EnvironmentEnum.Development) {
+    const document = SwaggerModule.createDocument(app, swaggerConfig);
+    SwaggerModule.setup('api', app, document);
+  }
+
+  // Validation
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      forbidUnknownValues: false,
+      whitelist: true,
+    }),
+  );
+
+  // Exception filter
+  app.useGlobalFilters(new HttpExceptionFilter());
+
+  const port = configService.get('port') || 3000;
+  await app.listen(port);
 }
 bootstrap();
